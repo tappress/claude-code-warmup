@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { kv } from "@vercel/kv";
+import Redis from "ioredis";
 
 const OAUTH_TOKEN_URL = "https://console.anthropic.com/v1/oauth/token";
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
@@ -15,34 +15,50 @@ interface TokenResponse {
     expires_in?: number;
 }
 
+function getRedis(): Redis {
+    const url = process.env.REDIS_URL;
+    if (!url) throw new Error("REDIS_URL env var is not set. Link a Redis store in your Vercel project.");
+    return new Redis(url);
+}
+
 /**
  * Resolve the refresh token to use.
  * Priority: Vercel KV (persisted/rotated token) → CLAUDE_REFRESH_TOKEN env var (initial seed).
  */
 async function resolveRefreshToken(): Promise<string> {
-    const stored = await kv.get<string>(KV_REFRESH_TOKEN_KEY);
-    if (stored) {
-        console.log("[warmup] Using refresh token from KV store.");
-        return stored;
+    const redis = getRedis();
+    try {
+        const stored = await redis.get(KV_REFRESH_TOKEN_KEY);
+        if (stored) {
+            console.log("[warmup] Using refresh token from Redis.");
+            return stored;
+        }
+    } finally {
+        await redis.quit();
     }
 
     const envToken = process.env.CLAUDE_REFRESH_TOKEN;
     if (!envToken) {
         throw new Error(
-            "No refresh token found. Add CLAUDE_REFRESH_TOKEN env var as initial seed — subsequent rotated tokens will be stored in KV automatically."
+            "No refresh token found. Add CLAUDE_REFRESH_TOKEN env var as initial seed — subsequent rotated tokens will be stored in Redis automatically."
         );
     }
 
-    console.log("[warmup] KV empty — using CLAUDE_REFRESH_TOKEN env var as initial seed.");
+    console.log("[warmup] Redis empty — using CLAUDE_REFRESH_TOKEN env var as initial seed.");
     return envToken;
 }
 
 /**
- * Persist a (possibly rotated) refresh token to KV for future runs.
+ * Persist a (possibly rotated) refresh token to Redis for future runs.
  */
 async function persistRefreshToken(token: string): Promise<void> {
-    await kv.set(KV_REFRESH_TOKEN_KEY, token);
-    console.log("[warmup] Persisted refresh token to KV store.");
+    const redis = getRedis();
+    try {
+        await redis.set(KV_REFRESH_TOKEN_KEY, token);
+        console.log("[warmup] Persisted refresh token to Redis.");
+    } finally {
+        await redis.quit();
+    }
 }
 
 /**
