@@ -32,7 +32,7 @@ Claude Code's rate limits work on a **rolling 5-hour window** — the clock star
 ### 1. Fork & Clone
 
 ```bash
-git clone https://github.com/your-username/claude-code-warmup
+git clone https://github.com/tappress/claude-code-warmup
 cd claude-code-warmup
 ```
 
@@ -113,17 +113,7 @@ npx vercel dev
 
 ## How the Auth Works
 
-Claude Code uses standard OAuth 2.0. Your refresh token (stored in `~/.claude/.credentials.json`) is exchanged for a short-lived access token each time the cron runs. No credentials are stored permanently by this service.
-
-The access token is used with the Anthropic API:
-- Header: `anthropic-beta: claude-code-20250219,oauth-2025-04-20`
-- Model: `claude-haiku-4-5-20251001` (cheapest, ~zero cost)
-
----
-
-## Article
-
-This project was built to accompany the article **"Dealing with Claude Code's time-based limits"** — explaining how to work smarter within Claude Max subscription limits.
+Claude Code uses standard OAuth 2.0. Your refresh token (stored in `~/.claude/.credentials.json`) is exchanged for a short-lived access token each time the cron runs.
 
 ---
 
