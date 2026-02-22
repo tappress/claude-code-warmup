@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Claude Code Warmup</title>
+    <meta name="description"
+        content="Scheduled Vercel function that warms up Claude Code's 5-hour rate limit window." />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #0d0e14;
+            --surface: #16181f;
+            --border: #2a2d3a;
+            --accent: #cc785c;
+            --text: #e8e9f0;
+            --muted: #8b8fa8;
+            --success: #4ade80;
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2.5rem 2.5rem 2rem;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), #e09070);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .logo-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .logo-sub {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 1px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.25;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #e8e9f0, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        p {
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            background: rgba(74, 222, 128, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(74, 222, 128, 0.25);
+            margin-bottom: 1.5rem;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 1.25rem 0;
+        }
+
+        .info-grid {
+            display: grid;
+            gap: 0.7rem;
+        }
+
+        .info-item {
+            display: flex;
+            gap: 0.7rem;
+            font-size: 0.83rem;
+            color: var(--muted);
+        }
+
+        code {
+            font-size: 0.8em;
+            background: rgba(255, 255, 255, 0.07);
+            padding: 0.1em 0.35em;
+            border-radius: 4px;
+        }
+
+        footer {
+            margin-top: 2rem;
+            font-size: 0.75rem;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .callout {
+            background: rgba(204, 120, 92, 0.07);
+            border: 1px solid rgba(204, 120, 92, 0.25);
+            border-radius: 10px;
+            padding: 1.25rem 1.25rem 1rem;
+        }
+
+        .callout-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+        }
+
+        .callout-body {
+            font-size: 0.82rem;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+        }
+
+        .callout-body strong {
+            color: var(--text);
+        }
+
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem;
+            margin: 0.75rem 0;
+        }
+
+        .compare-item {
+            border-radius: 8px;
+            padding: 0.65rem 0.85rem;
+            font-size: 0.8rem;
+        }
+
+        .compare-bad {
+            background: rgba(248, 113, 113, 0.08);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        .compare-good {
+            background: rgba(74, 222, 128, 0.08);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+        }
+
+        .compare-label {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+            color: var(--text);
+        }
+
+        .compare-detail {
+            color: var(--muted);
+        }
+
+        .callout-cta {
+            font-size: 0.8rem;
+            color: var(--muted);
+            font-style: italic;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <div class="logo">
+            <div class="logo-icon">⚡</div>
+            <div>
+                <div class="logo-title">Claude Code Warmup</div>
+                <div class="logo-sub">Vercel Cron Function</div>
+            </div>
+        </div>
+
+        <span class="badge">● Cron active</span>
+
+        <h1>Beat the 5-hour limit.</h1>
+        <p>
+            Claude Code's rate limits run on a rolling 5-hour window from your <em>first</em> request.
+            This cron job fires a tiny warm-up message hours before your workday — so the window resets
+            right when you need full quota.
+        </p>
+
+        <div class="divider"></div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <span>🕐</span>
+                <span>Schedule is set in <code>vercel.json</code> — adjust to 3–4 hours before your usual start time
+                    (UTC).</span>
+            </div>
+            <div class="info-item">
+                <span>🔑</span>
+                <span>Refresh token lives in <code>CLAUDE_REFRESH_TOKEN</code> env var. Rotations are auto-saved to
+                    KV.</span>
+            </div>
+            <div class="info-item">
+                <span>🔒</span>
+                <span>Endpoint is locked to Vercel cron only — no public access.</span>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="callout">
+            <div class="callout-title">📢 Dear Anthropic — please remove 5-hour limits</div>
+            <p class="callout-body">
+                The rolling 5-hour rate limit creates a frustrating experience that punishes developers
+                for <em>when</em> they work, not <em>how much</em> they work. If you sleep in and start
+                coding at noon, your window is already partially consumed — even though you haven't
+                touched Claude Code yet.
+            </p>
+            <p class="callout-body">
+                Compare this to <strong>OpenAI Codex</strong>, which only enforces a
+                <strong>weekly</strong> limit. You get your full quota regardless of what time of day
+                you start. Claude Code has <em>both</em> a 5-hour rolling window
+                <em>and</em> a weekly cap — double the friction.
+            </p>
+            <div class="compare-grid">
+                <div class="compare-item compare-bad">
+                    <div class="compare-label">Claude Code</div>
+                    <div class="compare-detail">5-hour rolling window <strong>+</strong> weekly cap</div>
+                </div>
+                <div class="compare-item compare-good">
+                    <div class="compare-label">OpenAI Codex</div>
+                    <div class="compare-detail">Weekly cap only ✓</div>
+                </div>
+            </div>
+            <p class="callout-cta">
+                This project exists as a workaround. Ideally, it shouldn't need to.
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        <a href="https://github.com/tappress/claude-code-warmup" target="_blank">View on GitHub</a>
+        &nbsp;·&nbsp; Built for Claude subscribers
+    </footer>
+</body>
+
+</html>

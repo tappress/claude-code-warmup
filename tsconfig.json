@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "commonjs",
+        "lib": [
+            "ES2022",
+            "dom"
+        ],
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "outDir": ".vercel/output",
+        "rootDir": ".",
+        "resolveJsonModule": true
+    },
+    "include": [
+        "api/**/*"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}
