@@ -61,14 +61,19 @@ Your Claude Code OAuth refresh token is stored locally after you log in:
 ```bash
 cat ~/.claude/.credentials.json | python3 -c "import sys,json; print(json.load(sys.stdin)['claudeAiOauth']['refreshToken'])"
 ```
+or
+
+```bash
+grep -o '"refreshToken":"[^"]*"' ~/.claude/.credentials.json | cut -d'"' -f4
+```
 
 Copy the value (starts with `sk-ant-ort01-...`).
 
 ### 4. Create a Vercel KV Store
 
-Vercel KV is **required** — it persists the refresh token across cron runs and automatically stores rotated tokens so the chain never breaks.
+Vercel Redis is **required** — it persists the refresh token across cron runs and automatically stores rotated tokens so the chain never breaks.
 
-1. In your Vercel project → **Storage** → **Create KV Database**
+1. In your Vercel project → **Storage** → **Create Database** and choose **Redis**
 2. Click **Connect** to link it to your project — Vercel will auto-add `REDIS_URL` and `` env vars
 
 ### 5. Import into Vercel
@@ -80,7 +85,7 @@ Vercel KV is **required** — it persists the refresh token across cron runs and
 |---|---|
 | `CLAUDE_REFRESH_TOKEN` | `sk-ant-ort01-...` (seed/initial refresh token) |
 | `WARMUP_MESSAGE` | *(optional)* Custom message |
-| `REDIS_URL` | *(auto-added if KV store linked)* |
+| `REDIS_URL` | *(auto-added if Redis store linked)* |
 | `` | *(auto-added if KV store linked)* |
 
 3. Deploy!
