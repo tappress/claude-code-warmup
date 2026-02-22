@@ -23,7 +23,7 @@ Claude Code's rate limits work on a **rolling 5-hour window** — the clock star
 
 ## One-Click Deploy
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/claude-code-warmup)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/tappress/claude-code-warmup)
 
 ---
 
