@@ -38,7 +38,7 @@ cd claude-code-warmup
 
 ### 2. Set the Cron Schedule
 
-Edit `vercel.json` and change the `schedule` to fire 3–4 hours before your usual start time (**UTC**):
+Edit `vercel.json` and change the `schedule` to fire 3–4 hours before your usual start time (**UTC**). Example config to run it at 6 AM UTC `"schedule": "0 6 * * *"`:
 
 ```json
 {
