@@ -108,6 +108,30 @@ npx vercel dev
 
 ---
 
+## Alternative: No Deploy, Just a Prompt
+
+Community tip from [@ramazansancar](https://github.com/ramazansancar): if you don't want to manage a token or a Vercel deployment, you can ask Claude to create a cloud scheduled task that sends a one-word reply on a schedule. Paste this prompt into a Claude chat and adjust the timezone and times to your own:
+
+```
+Create a recurring, cloud-based scheduled task inside this chat:
+
+Task: Reply to this chat stream with only the single word "OK". Do not open any external websites, URLs, or browser windows. Do not read files, perform web searches, or invoke any tools.
+
+Execution Mode: Run entirely in the cloud (requires local device: false). Do not attempt to connect to my local computer, Chrome browser, or any desktop session.
+
+Frequency & Schedule (Timezone: Europe/Istanbul):
+
+Every day, continuously 24/7.
+
+8 times a day at the following hours: 01:31, 04:31, 07:31, 10:31, 13:31, 16:31, 19:31, 22:31
+
+Pre-authorization: I explicitly authorize this task to execute automatically on schedule. Do not ask for confirmation on each run; post the message directly.
+```
+
+> **Tip:** Set the times relative to when your 5-hour window ends. Start with the schedule above, check when your window actually resets, then ask Claude to shift the times to just after that (for example from 05:40 to 05:41).
+
+---
+
 ## License
 
 MIT
