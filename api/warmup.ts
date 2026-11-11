@@ -76,6 +76,6 @@ export default async function handler(
     } catch (err) {
         const error = err instanceof Error ? err.message : String(err);
         console.error(`[warmup] ✗ Error at ${timestamp}: ${error}`);
-        return res.status(500).json({ success: false, error, timestamp });
+        return res.status(500).json({ success: false, error: "Warmup request failed.", timestamp });
     }
 }
